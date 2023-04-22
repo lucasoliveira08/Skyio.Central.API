@@ -18,14 +18,18 @@ model User {
 
   createdAt DateTime @default(now()) @db.Timestamp
   updatedAt DateTime @updatedAt @db.Timestamp
-  roles     Role[]
+
+  roles Role[]
 
   @@map("users")
 }
 
 model Role {
-  id     String  @id @default(uuid())
-  name   String  @unique
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @db.Timestamp
+  updatedAt DateTime @updatedAt @db.Timestamp
+
   users  User[]
   claims Claim[]
 
@@ -33,8 +37,11 @@ model Role {
 }
 
 model Claim {
-  id    String @id @default(uuid())
-  name  String @unique
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now()) @db.Timestamp
+  updatedAt DateTime @updatedAt @db.Timestamp
+
   roles Role[]
 
   @@map("claims")

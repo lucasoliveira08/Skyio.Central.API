@@ -6,9 +6,10 @@ import { PrismaModule } from '../../prisma/prisma.module';
 import { UsersRepository } from './users.repository';
 import { RolesService } from '../roles/roles.service';
 import { RolesRepository } from '../roles/roles.repository';
+import { PaginationModule } from 'src/utils/dto/pagination/pagination.module';
 
 @Module({
-  imports: [SendGridModule, PrismaModule],
+  imports: [SendGridModule, PrismaModule, PaginationModule],
   providers: [UsersService, UsersRepository, RolesService, RolesRepository],
   controllers: [UsersController],
   exports: [UsersService],

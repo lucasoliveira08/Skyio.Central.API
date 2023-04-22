@@ -3,13 +3,29 @@ import { Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateRoleDTO, FindOneRoleDTO, UpdateRoleDTO } from './dto/Roles.dto';
+import { PagedResult } from 'src/utils/dto/pagination/types.dto';
+import { PaginationService } from 'src/utils/dto/pagination/pagination.service';
+import { PaginationDTO } from 'src/utils/dto/pagination/pagination.dto';
 
 @Injectable()
 export class RolesRepository {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly paginationService: PaginationService,
+  ) {}
 
-  async findAllRoles(): Promise<Role[]> {
-    return this.prismaService.role.findMany();
+  async findAllRoles(pagination: PaginationDTO): Promise<PagedResult<Role>> {
+    const query: Prisma.RoleFindManyArgs = {
+      orderBy: {
+        [pagination.sortField]: pagination.sortBy,
+      },
+    };
+
+    return await this.paginationService.getPaged<Role>(
+      query,
+      pagination,
+      this.prismaService.role,
+    );
   }
 
   async findOneRole(filter: FindOneRoleDTO) {

@@ -6,6 +6,7 @@ import {
   Put,
   Post,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
@@ -13,6 +14,9 @@ import { Claims } from 'src/utils/decorators/claims.decorator';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { CreateRoleDTO, FindOneRoleDTO, UpdateRoleDTO } from './dto/Roles.dto';
 import { RolesService } from './roles.service';
+import { PagedResult } from 'src/utils/dto/pagination/types.dto';
+import { PaginationDTO } from 'src/utils/dto/pagination/pagination.dto';
+
 @ApiTags('Roles')
 @Controller('roles')
 export class RolesController {
@@ -21,8 +25,10 @@ export class RolesController {
   @Roles('Admin')
   @Claims('read-role')
   @Get()
-  async findAllRoles(): Promise<Role[]> {
-    return this.rolesService.findAllRoles();
+  async findAllRoles(
+    @Query() pagination: PaginationDTO,
+  ): Promise<PagedResult<Role>> {
+    return this.rolesService.findAllRoles(pagination);
   }
 
   @Roles('Admin')
