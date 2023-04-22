@@ -3,9 +3,10 @@ import { RolesService } from './roles.service';
 import { RolesController } from './roles.controller';
 import { RolesRepository } from './roles.repository';
 import { PrismaModule } from '../../prisma/prisma.module';
+import { PaginationModule } from 'src/utils/dto/pagination/pagination.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, PaginationModule],
   controllers: [RolesController],
   providers: [RolesService, RolesRepository],
 })

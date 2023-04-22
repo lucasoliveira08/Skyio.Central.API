@@ -7,13 +7,15 @@ import {
 import { Role } from '@prisma/client';
 import { CreateRoleDTO, FindOneRoleDTO, UpdateRoleDTO } from './dto/Roles.dto';
 import { RolesRepository } from './roles.repository';
+import { PagedResult } from 'src/utils/dto/pagination/types.dto';
+import { PaginationDTO } from 'src/utils/dto/pagination/pagination.dto';
 
 @Injectable()
 export class RolesService {
   constructor(private readonly rolesRepository: RolesRepository) {}
 
-  async findAllRoles(): Promise<Role[]> {
-    return await this.rolesRepository.findAllRoles();
+  async findAllRoles(pagination: PaginationDTO): Promise<PagedResult<Role>> {
+    return await this.rolesRepository.findAllRoles(pagination);
   }
 
   async findOneRole(filter: FindOneRoleDTO): Promise<Role | null> {
