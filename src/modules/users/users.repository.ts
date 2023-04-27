@@ -1,8 +1,8 @@
-import { Prisma, User } from '.prisma/client';
+import { User } from '.prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateUserDTO, FindOneUserDTO, UpdateUserDTO } from './dto/Users.dto';
-import * as crypto from 'crypto';
+
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -35,7 +35,7 @@ export class UsersRepository {
       data: {
         email: input.email,
         password: cryptedPass,
-        recoverToken: crypto.randomBytes(32).toString('hex'),
+        recoverToken: null,
         roles: {
           connect: {
             id: input.roleId,
@@ -55,12 +55,32 @@ export class UsersRepository {
   }
 
   async updateUser(id: string, input: UpdateUserDTO): Promise<User> {
+    const cryptedPass = input.password
+      ? await bcrypt.hash(input.password, 14)
+      : undefined;
+
+    const user = this.prismaService.user.update({
+      data: {
+        email: input.email,
+        password: cryptedPass,
+        recoverToken: input.recoverToken,
+      },
+      where: {
+        id: id,
+      },
+    });
+
+    return user;
+  }
+
+  async updateUserWithRoles(id: string, input: UpdateUserDTO): Promise<User> {
     const cryptedPass = await bcrypt.hash(input.password, 14);
 
     const user = this.prismaService.user.update({
       data: {
         email: input.email,
         password: cryptedPass,
+        recoverToken: input.recoverToken,
         roles: {
           connect: {
             id: input.roleId,

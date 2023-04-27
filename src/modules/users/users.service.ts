@@ -21,7 +21,7 @@ export class UsersService {
   }
 
   async findOneUser(filter: FindOneUserDTO): Promise<User | null> {
-    if (!filter.email && !filter.id) return null;
+    if (!filter.email && !filter.id && !filter.recoverToken) return null;
 
     const user = await this.usersRepository.findOneUser(filter);
 

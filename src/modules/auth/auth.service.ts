@@ -1,9 +1,15 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { SendGridProducerService } from '../../utils/jobs/sendgrid/sendgrid-producer.service';
-import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { Role } from '@prisma/client';
+import {
+  RecoverPasswordDTO,
+  RequestRecoverPasswordDTO,
+} from '../users/dto/Users.dto';
+import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
+import { encryptSHA256 } from 'src/utils/functions/encrypt';
 
 @Injectable()
 export class AuthService {
@@ -83,5 +89,34 @@ export class AuthService {
     } catch (error) {
       return { expired: true };
     }
+  }
+
+  async requestResetPassword(input: RequestRecoverPasswordDTO) {
+    const user = await this.userService.findOneUser({
+      email: input.email,
+    });
+
+    if (user) {
+      const resetToken = crypto.randomBytes(32).toString('hex');
+
+      const passwordResetToken = encryptSHA256(resetToken);
+
+      await this.userService.updateUser(user.id, {
+        recoverToken: passwordResetToken,
+      });
+    }
+  }
+
+  async resetPassword(token: string, input: RecoverPasswordDTO) {
+    const passwordResetToken = encryptSHA256(token);
+
+    const user = await this.userService.findOneUser({
+      recoverToken: passwordResetToken,
+    });
+
+    await this.userService.updateUser(user.id, {
+      password: input.password,
+      recoverToken: null,
+    });
   }
 }

@@ -5,11 +5,18 @@ import {
   Res,
   Body,
   UseGuards,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import { LocalAuthGuard } from './modules/auth/local-auth.guard';
 import { AuthService } from './modules/auth/auth.service';
 import { Public } from './utils/decorators/isPublic.decorator';
-import { CreateUserDTO, LoginUserDTO } from './modules/users/dto/Users.dto';
+import {
+  CreateUserDTO,
+  LoginUserDTO,
+  RecoverPasswordDTO,
+  RequestRecoverPasswordDTO,
+} from './modules/users/dto/Users.dto';
 import { UsersService } from './modules/users/users.service';
 import 'dotenv/config';
 import { ApiTags } from '@nestjs/swagger';
@@ -96,5 +103,26 @@ export class AppController {
     return {
       logout: true,
     };
+  }
+
+  @Public()
+  @Post('auth/requestResetPassword')
+  async requestResetPassword(
+    @Body() input: RequestRecoverPasswordDTO,
+    @Res({ passthrough: true }) res,
+  ): Promise<any> {
+    this.authService.requestResetPassword(input);
+    res.status(204);
+  }
+
+  @Public()
+  @Patch('auth/resetPassword/:token')
+  async resetPassword(
+    @Param('token') token: string,
+    @Body() input: RecoverPasswordDTO,
+    @Res({ passthrough: true }) res,
+  ): Promise<any> {
+    this.authService.resetPassword(token, input);
+    res.status(204);
   }
 }
